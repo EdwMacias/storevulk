@@ -114,6 +114,7 @@ venv.bak/
 
 # Media files
 media/
+logs_pics/
 
 # Static files
 staticfiles/
