@@ -118,3 +118,6 @@ logs_pics/
 
 # Static files
 staticfiles/
+
+#docker builds
+docker.compose.yml
