@@ -13,38 +13,65 @@ services:
       # Mount static files (optional for development)
       - ./staticfiles:/app/staticfiles
     environment:
-      - DEBUG=False
-      - SECRET_KEY=xxxxx
-      - ALLOWED_HOSTS=localhost,127.0.0.1,0.0.0.0
-      - DATABASE_ENGINE=sqlite3
-      - SECURE_SSL_REDIRECT=True
-      - SECURE_PROXY_SSL_HEADER=HTTP_X_FORWARDED_PROTO,https
-      - DJANGO_LOG_LEVEL=INFO
-      - SUPERUSER=admin
-      - SUPERUSER_PASSWORD=admin
-    # depends_on:
-      # - db  # Not needed for SQLite
+      - DEBUG=${DEBUG}
+      - SECRET_KEY=${SECRET_KEY}
+      - ALLOWED_HOSTS=${ALLOWED_HOSTS}
+      - DATABASE_ENGINE=${DATABASE_ENGINE}
+      - SECURE_SSL_REDIRECT=${SECURE_SSL_REDIRECT}
+      - SECURE_PROXY_SSL_HEADER=${SECURE_PROXY_SSL_HEADER}
+      - DJANGO_LOG_LEVEL=${DJANGO_LOG_LEVEL}
+      - SUPERUSER=${SUPERUSER}
+      - SUPERUSER_PASSWORD=${SUPERUSER_PASSWORD}
+      # Variables adicionales para PostgreSQL (si decides cambiar)
+      - DATABASE_NAME=${DATABASE_NAME:-software}
+      - DATABASE_USER=${DATABASE_USER:-user}
+      - DATABASE_PASSWORD=${DATABASE_PASSWORD:-password}
+      - DATABASE_HOST=${DATABASE_HOST:-db}
+      - DATABASE_PORT=${DATABASE_PORT:-5432}
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
-  # Optional PostgreSQL service (comment out if using SQLite)
+  # PostgreSQL service (descomentado para producción robusta)
   db:
     image: postgres:15-alpine
     volumes:
       - postgres_data:/var/lib/postgresql/data
     environment:
-      - POSTGRES_DB=software
-      - POSTGRES_USER=user
-      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=${DATABASE_NAME:-software}
+      - POSTGRES_USER=${DATABASE_USER:-user}
+      - POSTGRES_PASSWORD=${DATABASE_PASSWORD:-password}
     ports:
       - "5432:5432"
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DATABASE_USER:-user}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
-  # Optional: pgAdmin for database management
+  # Redis para cache (opcional pero recomendado para producción)
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    profiles:
+      - cache
+
+  # pgAdmin para gestión de base de datos (solo para desarrollo)
   pgadmin:
     image: dpage/pgadmin4:latest
     environment:
-      - PGADMIN_DEFAULT_EMAIL=no@mail.com
-      - PGADMIN_DEFAULT_PASSWORD=password
+      - PGADMIN_DEFAULT_EMAIL=${PGADMIN_EMAIL:-admin@example.com}
+      - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_PASSWORD:-admin123}
     ports:
       - "5050:80"
     depends_on:
@@ -55,3 +82,4 @@ services:
 
 volumes:
   postgres_data:
+  redis_data:
