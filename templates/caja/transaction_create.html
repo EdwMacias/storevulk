@@ -1,0 +1,240 @@
+{% extends 'base.html' %}
+
+{% block title %}Nueva Transacción{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h4>
+                            <i class="bi bi-plus-circle"></i>
+                            Nueva Transacción
+                            {% if transaction_type == 'income' %}
+                                <span class="badge bg-success ms-2">Ingreso</span>
+                            {% elif transaction_type == 'outcome' %}
+                                <span class="badge bg-danger ms-2">Egreso</span>
+                            {% endif %}
+                        </h4>
+                        <a href="{% url 'caja:dashboard' %}" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left"></i> Volver al Dashboard
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <form method="post" id="transactionForm">
+                        {% csrf_token %}
+
+                        <div class="row">
+                            <!-- Transaction Type and Amount -->
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="{{ form.transaction_type.id_for_label }}" class="form-label">
+                                        <i class="bi bi-arrow-up-down"></i> Tipo de Transacción *
+                                    </label>
+                                    {{ form.transaction_type }}
+                                    {% if form.transaction_type.errors %}
+                                        <div class="text-danger small">{{ form.transaction_type.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="{{ form.amount.id_for_label }}" class="form-label">
+                                        <i class="bi bi-currency-dollar"></i> Monto *
+                                    </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">$</span>
+                                        {{ form.amount }}
+                                    </div>
+                                    {% if form.amount.errors %}
+                                        <div class="text-danger small">{{ form.amount.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Description -->
+                        <div class="mb-3">
+                            <label for="{{ form.description.id_for_label }}" class="form-label">
+                                <i class="bi bi-text-left"></i> Descripción *
+                            </label>
+                            {{ form.description }}
+                            {% if form.description.errors %}
+                                <div class="text-danger small">{{ form.description.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Category -->
+                        <div class="mb-3">
+                            <label for="{{ form.category.id_for_label }}" class="form-label">
+                                <i class="bi bi-tags"></i> Categoría *
+                            </label>
+                            {{ form.category }}
+                            {% if form.category.errors %}
+                                <div class="text-danger small">{{ form.category.errors }}</div>
+                            {% endif %}
+                            <div class="form-text">Selecciona la categoría que mejor describe esta transacción</div>
+                        </div>
+
+                        <div class="row">
+                            <!-- Payment Method -->
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="{{ form.payment_method.id_for_label }}" class="form-label">
+                                        <i class="bi bi-credit-card"></i> Método de Pago *
+                                    </label>
+                                    {{ form.payment_method }}
+                                    {% if form.payment_method.errors %}
+                                        <div class="text-danger small">{{ form.payment_method.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- Reference Number -->
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="{{ form.reference_number.id_for_label }}" class="form-label">
+                                        <i class="bi bi-hash"></i> Número de Referencia
+                                    </label>
+                                    {{ form.reference_number }}
+                                    {% if form.reference_number.errors %}
+                                        <div class="text-danger small">{{ form.reference_number.errors }}</div>
+                                    {% endif %}
+                                    <div class="form-text">Número de comprobante, factura, etc.</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <!-- Bank -->
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="{{ form.bank.id_for_label }}" class="form-label">
+                                        <i class="bi bi-bank"></i> Banco
+                                    </label>
+                                    {{ form.bank }}
+                                    {% if form.bank.errors %}
+                                        <div class="text-danger small">{{ form.bank.errors }}</div>
+                                    {% endif %}
+                                    <div class="form-text">Requerido para transferencias y tarjetas</div>
+                                </div>
+                            </div>
+
+                            <!-- Entity -->
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="{{ form.entity.id_for_label }}" class="form-label">
+                                        <i class="bi bi-building"></i> Entidad
+                                    </label>
+                                    {{ form.entity }}
+                                    {% if form.entity.errors %}
+                                        <div class="text-danger small">{{ form.entity.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Commission Section -->
+                        <div class="card bg-light mb-3">
+                            <div class="card-body">
+                                <h6><i class="bi bi-percent"></i> Información de Comisiones</h6>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="{{ form.commission_percentage.id_for_label }}" class="form-label">
+                                                Porcentaje de Comisión (%)
+                                            </label>
+                                            <div class="input-group">
+                                                {{ form.commission_percentage }}
+                                                <span class="input-group-text">%</span>
+                                            </div>
+                                            {% if form.commission_percentage.errors %}
+                                                <div class="text-danger small">{{ form.commission_percentage.errors }}</div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="{{ form.commission.id_for_label }}" class="form-label">
+                                                Comisión Fija ($)
+                                            </label>
+                                            <div class="input-group">
+                                                <span class="input-group-text">$</span>
+                                                {{ form.commission }}
+                                            </div>
+                                            {% if form.commission.errors %}
+                                                <div class="text-danger small">{{ form.commission.errors }}</div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Notes -->
+                        <div class="mb-3">
+                            <label for="{{ form.notes.id_for_label }}" class="form-label">
+                                <i class="bi bi-journal-text"></i> Notas Adicionales
+                            </label>
+                            {{ form.notes }}
+                            {% if form.notes.errors %}
+                                <div class="text-danger small">{{ form.notes.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        {% if form.non_field_errors %}
+                            <div class="alert alert-danger">
+                                {{ form.non_field_errors }}
+                            </div>
+                        {% endif %}
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{% url 'caja:dashboard' %}" class="btn btn-secondary me-md-2">
+                                <i class="bi bi-x-circle"></i> Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-circle"></i> Registrar Transacción
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const transactionType = document.getElementById('transaction_type');
+    const amount = document.getElementById('amount');
+    const commissionPercentage = document.getElementById('commission_percentage');
+    const commission = document.getElementById('commission');
+
+    // Auto-calculate commission when percentage changes
+    function calculateCommission() {
+        const amountValue = parseFloat(amount.value) || 0;
+        const percentageValue = parseFloat(commissionPercentage.value) || 0;
+
+        if (amountValue > 0 && percentageValue > 0) {
+            const calculatedCommission = (amountValue * percentageValue / 100).toFixed(2);
+            commission.value = calculatedCommission;
+        }
+    }
+
+    commissionPercentage.addEventListener('input', calculateCommission);
+    amount.addEventListener('input', calculateCommission);
+
+    // Set initial transaction type if provided in URL
+    {% if transaction_type %}
+        transactionType.value = '{{ transaction_type }}';
+    {% endif %}
+});
+</script>
+{% endblock %}

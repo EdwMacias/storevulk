@@ -1,0 +1,370 @@
+{% extends 'base.html' %}
+
+{% block title %}Reporte de Cierre - {{ register.name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1><i class="bi bi-file-earmark-text"></i> Reporte de Cierre - {{ register.name }}</h1>
+                <div class="btn-group" role="group">
+                    <a href="{% url 'caja:dashboard' %}" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left"></i> Volver al Dashboard
+                    </a>
+                    <button onclick="window.print()" class="btn btn-primary">
+                        <i class="bi bi-printer"></i> Imprimir Reporte
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Report Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-info-circle"></i> Información del Turno
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <table class="table table-borderless">
+                                <tr>
+                                    <th>Caja:</th>
+                                    <td>{{ register.name }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Usuario:</th>
+                                    <td>{{ register.opened_by.username }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Fecha de Apertura:</th>
+                                    <td>{{ register.opened_at|date:"d/m/Y H:i" }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Fecha de Cierre:</th>
+                                    <td>{{ register.closed_at|date:"d/m/Y H:i" }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <table class="table table-borderless">
+                                <tr>
+                                    <th>Duración del Turno:</th>
+                                    <td>
+                                        {% if report.shift_duration_minutes %}
+                                            {{ report.shift_duration_minutes|floatformat:0 }} minutos
+                                            ({{ report.shift_duration_minutes|floatformat:0|add:0|div:60|floatformat:1 }} horas)
+                                        {% else %}
+                                            No disponible
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Total Transacciones:</th>
+                                    <td>{{ report.transaction_count }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Estado:</th>
+                                    <td>
+                                        <span class="badge bg-secondary">{{ register.get_status_display }}</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Reporte Generado:</th>
+                                    <td>{{ report.created_at|date:"d/m/Y H:i" }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Financial Summary -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header bg-primary text-white">
+                    <h6 class="mb-0"><i class="bi bi-calculator"></i> Resumen Financiero</h6>
+                </div>
+                <div class="card-body">
+                    <table class="table table-borderless">
+                        <tr>
+                            <td><strong>Saldo Inicial:</strong></td>
+                            <td class="text-end">${{ report.opening_balance|floatformat:2 }}</td>
+                        </tr>
+                        <tr class="text-success">
+                            <td><strong>Total Ingresos:</strong></td>
+                            <td class="text-end">+${{ report.total_income|floatformat:2 }}</td>
+                        </tr>
+                        <tr class="text-danger">
+                            <td><strong>Total Egresos:</strong></td>
+                            <td class="text-end">-${{ report.total_outcome|floatformat:2 }}</td>
+                        </tr>
+                        <tr class="text-warning">
+                            <td><strong>Total Comisiones:</strong></td>
+                            <td class="text-end">${{ report.total_commissions|floatformat:2 }}</td>
+                        </tr>
+                        <tr class="border-top">
+                            <td><strong>Saldo Final:</strong></td>
+                            <td class="text-end">
+                                <h5 class="mb-0">${{ report.closing_balance|floatformat:2 }}</h5>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header bg-success text-white">
+                    <h6 class="mb-0"><i class="bi bi-pie-chart"></i> Ingresos por Categoría</h6>
+                </div>
+                <div class="card-body">
+                    <table class="table table-sm">
+                        {% if report.papeleria_income > 0 %}
+                            <tr>
+                                <td>Ventas de Papelería:</td>
+                                <td class="text-end text-success">${{ report.papeleria_income|floatformat:2 }}</td>
+                            </tr>
+                        {% endif %}
+                        {% if report.bank_operations_income > 0 %}
+                            <tr>
+                                <td>Operaciones Bancarias:</td>
+                                <td class="text-end text-success">${{ report.bank_operations_income|floatformat:2 }}</td>
+                            </tr>
+                        {% endif %}
+                        {% if report.commission_income > 0 %}
+                            <tr>
+                                <td>Ingresos por Comisiones:</td>
+                                <td class="text-end text-success">${{ report.commission_income|floatformat:2 }}</td>
+                            </tr>
+                        {% endif %}
+                        {% if report.general_transactions_income > 0 %}
+                            <tr>
+                                <td>Transacciones Generales:</td>
+                                <td class="text-end text-success">${{ report.general_transactions_income|floatformat:2 }}</td>
+                            </tr>
+                        {% endif %}
+                        {% if report.other_income > 0 %}
+                            <tr>
+                                <td>Otros Ingresos:</td>
+                                <td class="text-end text-success">${{ report.other_income|floatformat:2 }}</td>
+                            </tr>
+                        {% endif %}
+                        {% if report.total_income == 0 %}
+                            <tr>
+                                <td colspan="2" class="text-center text-muted">
+                                    <em>No hubo ingresos en este turno</em>
+                                </td>
+                            </tr>
+                        {% endif %}
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payment Methods Breakdown -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h6 class="mb-0"><i class="bi bi-credit-card"></i> Breakdown por Método de Pago</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        {% if report.cash_total != 0 %}
+                            <div class="col-md-3">
+                                <div class="text-center">
+                                    <div class="bg-success text-white rounded p-3 mb-2">
+                                        <h6>Efectivo</h6>
+                                        <h4>${{ report.cash_total|floatformat:2 }}</h4>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                        {% if report.transfer_total != 0 %}
+                            <div class="col-md-3">
+                                <div class="text-center">
+                                    <div class="bg-primary text-white rounded p-3 mb-2">
+                                        <h6>Transferencias</h6>
+                                        <h4>${{ report.transfer_total|floatformat:2 }}</h4>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                        {% if report.card_total != 0 %}
+                            <div class="col-md-3">
+                                <div class="text-center">
+                                    <div class="bg-warning text-dark rounded p-3 mb-2">
+                                        <h6>Tarjetas</h6>
+                                        <h4>${{ report.card_total|floatformat:2 }}</h4>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                        {% if report.other_payment_total != 0 %}
+                            <div class="col-md-3">
+                                <div class="text-center">
+                                    <div class="bg-secondary text-white rounded p-3 mb-2">
+                                        <h6>Otros Métodos</h6>
+                                        <h4>${{ report.other_payment_total|floatformat:2 }}</h4>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cash Reconciliation -->
+    {% if report.physical_cash_count is not None %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card {% if report.has_cash_discrepancy %}border-danger{% else %}border-success{% endif %}">
+                <div class="card-header {% if report.has_cash_discrepancy %}bg-danger{% else %}bg-success{% endif %} text-white">
+                    <h6 class="mb-0">
+                        <i class="bi bi-cash"></i> Reconciliación de Efectivo
+                        {% if report.has_cash_discrepancy %}
+                            <span class="badge bg-warning text-dark ms-2">Discrepancia Detectada</span>
+                        {% else %}
+                            <span class="badge bg-light text-dark ms-2">Balanceado</span>
+                        {% endif %}
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="text-center">
+                                <h6>Efectivo Esperado</h6>
+                                <h4>${{ report.expected_cash_balance|floatformat:2 }}</h4>
+                                <small class="text-muted">Basado en transacciones</small>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="text-center">
+                                <h6>Efectivo Contado</h6>
+                                <h4>${{ report.physical_cash_count|floatformat:2 }}</h4>
+                                <small class="text-muted">Conteo físico</small>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="text-center">
+                                <h6>Diferencia</h6>
+                                <h4 class="{% if report.cash_difference >= 0 %}text-success{% else %}text-danger{% endif %}">
+                                    {% if report.cash_difference >= 0 %}+{% endif %}${{ report.cash_difference|floatformat:2 }}
+                                </h4>
+                                <small class="text-muted">
+                                    {% if report.cash_difference == 0 %}
+                                        Perfecto balance
+                                    {% elif report.cash_difference > 0 %}
+                                        Sobrante de efectivo
+                                    {% else %}
+                                        Faltante de efectivo
+                                    {% endif %}
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Notes -->
+    {% if report.notes %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0"><i class="bi bi-journal-text"></i> Notas del Cierre</h6>
+                </div>
+                <div class="card-body">
+                    <p class="mb-0">{{ report.notes }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Net Performance Summary -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card bg-dark text-white">
+                <div class="card-body text-center">
+                    <h5><i class="bi bi-trophy"></i> Resumen del Turno</h5>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <h6>Ganancia Neta</h6>
+                            <h3 class="{% if report.total_income > report.total_outcome %}text-success{% else %}text-warning{% endif %}">
+                                ${{ report.total_income|sub:report.total_outcome|floatformat:2 }}
+                            </h3>
+                        </div>
+                        <div class="col-md-3">
+                            <h6>Comisiones Generadas</h6>
+                            <h3 class="text-info">${{ report.total_commissions|floatformat:2 }}</h3>
+                        </div>
+                        <div class="col-md-3">
+                            <h6>Promedio por Transacción</h6>
+                            <h3 class="text-light">
+                                {% if report.transaction_count > 0 %}
+                                    ${{ report.total_income|div:report.transaction_count|floatformat:2 }}
+                                {% else %}
+                                    $0.00
+                                {% endif %}
+                            </h3>
+                        </div>
+                        <div class="col-md-3">
+                            <h6>Duración del Turno</h6>
+                            <h3 class="text-light">
+                                {% if report.shift_duration_minutes %}
+                                    {{ report.shift_duration_minutes|floatformat:0|add:0|div:60|floatformat:1 }}h
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                            </h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_css %}
+<style>
+@media print {
+    .btn-group {
+        display: none !important;
+    }
+
+    .container-fluid {
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    .card {
+        border: 1px solid #000 !important;
+        page-break-inside: avoid;
+    }
+
+    .bg-dark, .bg-primary, .bg-success, .bg-info, .bg-warning, .bg-danger {
+        -webkit-print-color-adjust: exact !important;
+        color-adjust: exact !important;
+    }
+}
+</style>
+{% endblock %}

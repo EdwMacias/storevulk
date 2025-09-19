@@ -1,0 +1,227 @@
+{% extends 'base.html' %}
+
+{% block title %}Cerrar Caja{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card border-warning">
+                <div class="card-header bg-warning text-dark">
+                    <h4 class="mb-0">
+                        <i class="bi bi-lock"></i> Cerrar Caja: {{ register.name }}
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i>
+                        <strong>Resumen de Cierre:</strong> Revisa todos los totales y realiza el conteo de efectivo antes de cerrar la caja.
+                        Una vez cerrada, se generará un reporte detallado del turno.
+                    </div>
+
+                    <!-- Financial Summary -->
+                    <div class="card bg-light mb-4">
+                        <div class="card-body">
+                            <h5><i class="bi bi-calculator"></i> Resumen Financiero</h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <table class="table table-borderless">
+                                        <tr>
+                                            <td><strong>Saldo Inicial:</strong></td>
+                                            <td class="text-end">${{ register.opening_balance|floatformat:2 }}</td>
+                                        </tr>
+                                        <tr class="text-success">
+                                            <td><strong>Total Ingresos:</strong></td>
+                                            <td class="text-end">+${{ summary.total_income|floatformat:2 }}</td>
+                                        </tr>
+                                        <tr class="text-danger">
+                                            <td><strong>Total Egresos:</strong></td>
+                                            <td class="text-end">-${{ summary.total_outcome|floatformat:2 }}</td>
+                                        </tr>
+                                        <tr class="border-top">
+                                            <td><strong>Balance Final:</strong></td>
+                                            <td class="text-end">
+                                                <h5 class="mb-0">${{ summary.final_balance|floatformat:2 }}</h5>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="text-center">
+                                        <div class="bg-primary text-white rounded p-3">
+                                            <h6 class="mb-1">Ganancia Neta del Turno</h6>
+                                            <h4 class="mb-0">
+                                                {% if summary.net_total >= 0 %}
+                                                    <span class="text-success">+${{ summary.net_total|floatformat:2 }}</span>
+                                                {% else %}
+                                                    <span class="text-warning">${{ summary.net_total|floatformat:2 }}</span>
+                                                {% endif %}
+                                            </h4>
+                                            <small>{{ summary.transaction_count }} transacciones</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Income Breakdown by Category -->
+                    {% if summary.category_breakdown %}
+                    <div class="card bg-light mb-4">
+                        <div class="card-body">
+                            <h6><i class="bi bi-pie-chart"></i> Ingresos por Categoría</h6>
+                            <div class="row">
+                                {% for category, amount in summary.category_breakdown.items %}
+                                    <div class="col-md-6 mb-2">
+                                        <div class="d-flex justify-content-between">
+                                            <span>{{ category }}:</span>
+                                            <strong class="text-success">${{ amount|floatformat:2 }}</strong>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Payment Method Breakdown -->
+                    {% if summary.payment_breakdown %}
+                    <div class="card bg-light mb-4">
+                        <div class="card-body">
+                            <h6><i class="bi bi-credit-card"></i> Resumen por Método de Pago</h6>
+                            <div class="table-responsive">
+                                <table class="table table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Método</th>
+                                            <th class="text-end">Ingresos</th>
+                                            <th class="text-end">Egresos</th>
+                                            <th class="text-end">Neto</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for method, amounts in summary.payment_breakdown.items %}
+                                            <tr>
+                                                <td>{{ method }}</td>
+                                                <td class="text-end text-success">${{ amounts.income|floatformat:2 }}</td>
+                                                <td class="text-end text-danger">${{ amounts.outcome|floatformat:2 }}</td>
+                                                <td class="text-end">
+                                                    {% if amounts.net >= 0 %}
+                                                        <span class="text-success">${{ amounts.net|floatformat:2 }}</span>
+                                                    {% else %}
+                                                        <span class="text-danger">${{ amounts.net|floatformat:2 }}</span>
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Cash Reconciliation -->
+                    <div class="card bg-warning bg-opacity-25 mb-4">
+                        <div class="card-body">
+                            <h6><i class="bi bi-cash"></i> Reconciliación de Efectivo</h6>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="alert alert-info mb-3">
+                                        <strong>Efectivo Esperado:</strong> ${{ summary.expected_cash|floatformat:2 }}
+                                        <br><small>Saldo inicial + ingresos en efectivo - egresos en efectivo</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <form method="post">
+                                        {% csrf_token %}
+
+                                        <div class="mb-3">
+                                            <label for="{{ form.physical_cash_count.id_for_label }}" class="form-label">
+                                                <i class="bi bi-currency-dollar"></i> {{ form.physical_cash_count.label }}
+                                            </label>
+                                            <div class="input-group">
+                                                <span class="input-group-text">$</span>
+                                                {{ form.physical_cash_count }}
+                                            </div>
+                                            {% if form.physical_cash_count.errors %}
+                                                <div class="text-danger small">{{ form.physical_cash_count.errors }}</div>
+                                            {% endif %}
+                                            <div class="form-text">{{ form.physical_cash_count.help_text }}</div>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label for="{{ form.notes.id_for_label }}" class="form-label">
+                                                <i class="bi bi-journal-text"></i> {{ form.notes.label }}
+                                            </label>
+                                            {{ form.notes }}
+                                            {% if form.notes.errors %}
+                                                <div class="text-danger small">{{ form.notes.errors }}</div>
+                                            {% endif %}
+                                        </div>
+
+                                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                            <a href="{% url 'caja:dashboard' %}" class="btn btn-secondary me-md-2">
+                                                <i class="bi bi-arrow-left"></i> Volver al Dashboard
+                                            </a>
+                                            <button type="submit" class="btn btn-warning">
+                                                <i class="bi bi-lock"></i> Confirmar Cierre de Caja
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Session Information -->
+                    <div class="card bg-light">
+                        <div class="card-body">
+                            <h6><i class="bi bi-clock"></i> Información de la Sesión</h6>
+                            <div class="row small">
+                                <div class="col-md-6">
+                                    <strong>Abierta por:</strong> {{ register.opened_by.username }}<br>
+                                    <strong>Fecha de apertura:</strong> {{ register.opened_at|date:"d/m/Y H:i" }}
+                                </div>
+                                <div class="col-md-6">
+                                    <strong>Duración aproximada:</strong>
+                                    {% now "c" as current_time %}
+                                    {% with duration=register.opened_at|timesince %}
+                                        {{ duration }}
+                                    {% endwith %}
+                                </div>
+                            </div>
+                            {% if register.notes %}
+                                <div class="mt-2">
+                                    <strong>Notas de apertura:</strong><br>
+                                    <small class="text-muted">{{ register.notes }}</small>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const physicalCashInput = document.getElementById('{{ form.physical_cash_count.id_for_label }}');
+    const expectedCash = {{ summary.expected_cash }};
+
+    if (physicalCashInput) {
+        physicalCashInput.addEventListener('input', function() {
+            const physicalCash = parseFloat(this.value) || 0;
+            const difference = physicalCash - expectedCash;
+
+            // You could add visual feedback here for differences
+            console.log('Diferencia:', difference);
+        });
+    }
+});
+</script>
+{% endblock %}

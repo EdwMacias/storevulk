@@ -1,47 +1,48 @@
 {% extends 'base.html' %}
-{% load crispy_forms_tags %}
 
-{% block title %}Login - Software Tienda{% endblock %}
+{% block title %}Iniciar Sesión - Software Tienda{% endblock %}
 
 {% block content %}
 <div class="container mt-5">
     <div class="row justify-content-center">
         <div class="col-md-6 col-lg-4">
             <div class="card shadow">
-                <div class="card-header bg-primary text-white text-center">
-                    <h4><i class="bi bi-box-arrow-in-right"></i> Login</h4>
-                </div>
                 <div class="card-body">
+                    <div class="text-center mb-4">
+                        <i class="bi bi-shop display-4 text-primary"></i>
+                        <h2 class="h4 mt-2">Iniciar Sesión</h2>
+                        <p class="text-muted">Accede a tu cuenta</p>
+                    </div>
+                    
                     <form method="post">
                         {% csrf_token %}
                         <div class="mb-3">
-                            <label for="username" class="form-label">Username</label>
-                            <div class="input-group">
-                                <span class="input-group-text"><i class="bi bi-person"></i></span>
-                                <input type="text" class="form-control" name="username" id="username" required>
-                            </div>
+                            <label for="{{ form.username.id_for_label }}" class="form-label">
+                                <i class="bi bi-person"></i> Usuario
+                            </label>
+                            {{ form.username }}
                         </div>
                         
                         <div class="mb-3">
-                            <label for="password" class="form-label">Password</label>
-                            <div class="input-group">
-                                <span class="input-group-text"><i class="bi bi-lock"></i></span>
-                                <input type="password" class="form-control" name="password" id="password" required>
-                            </div>
+                            <label for="{{ form.password.id_for_label }}" class="form-label">
+                                <i class="bi bi-lock"></i> Contraseña
+                            </label>
+                            {{ form.password }}
                         </div>
                         
                         <div class="d-grid">
                             <button type="submit" class="btn btn-primary">
-                                <i class="bi bi-box-arrow-in-right"></i> Login
+                                <i class="bi bi-box-arrow-in-right"></i> Iniciar Sesión
                             </button>
                         </div>
                     </form>
-                </div>
-                <div class="card-footer text-center bg-light">
-                    <small class="text-muted">
-                        Don't have an account? 
-                        <a href="{% url 'accounts:signup' %}" class="text-decoration-none">Sign up here</a>
-                    </small>
+                    
+                    <div class="text-center mt-3">
+                        <p class="mb-0">
+                            ¿No tienes cuenta? 
+                            <a href="{% url 'accounts:signup' %}" class="text-primary">Crear cuenta</a>
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>

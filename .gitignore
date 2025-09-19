@@ -121,3 +121,4 @@ staticfiles/
 
 #docker builds
 docker.compose.yml
+CLAUDE.md

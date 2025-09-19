@@ -29,13 +29,57 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'main:home' %}">Home</a>
                     </li>
+                    {% if user.is_authenticated %}
+                        <!-- POS Modules -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                <i class="bi bi-shop"></i> Punto de Venta
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="{% url 'caja:dashboard' %}">
+                                    <i class="bi bi-cash-stack"></i> Caja
+                                </a></li>
+                                <li><a class="dropdown-item" href="{% url 'caja:transaction_list' %}">
+                                    <i class="bi bi-list-ul"></i> Transacciones
+                                </a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="#" onclick="alert('Próximamente: Papelería')">
+                                    <i class="bi bi-journal-text"></i> Papelería
+                                </a></li>
+                                <li><a class="dropdown-item" href="#" onclick="alert('Próximamente: Banco')">
+                                    <i class="bi bi-bank"></i> Banco
+                                </a></li>
+                            </ul>
+                        </li>
+
+                        {% if user.is_admin %}
+                            <!-- Admin Section -->
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                    <i class="bi bi-gear"></i> Administración
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href="{% url 'accounts:admin_dashboard' %}">
+                                        <i class="bi bi-speedometer2"></i> Panel de Control
+                                    </a></li>
+                                    <li><a class="dropdown-item" href="{% url 'accounts:admin_user_list' %}">
+                                        <i class="bi bi-people"></i> Gestión de Usuarios
+                                    </a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" href="/admin/">
+                                        <i class="bi bi-tools"></i> Django Admin
+                                    </a></li>
+                                </ul>
+                            </li>
+                        {% endif %}
+                    {% endif %}
                 </ul>
                 
                 <ul class="navbar-nav">
                     {% if user.is_authenticated %}
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                                <i class="bi bi-person-circle"></i> {{ user.username }}
+                                <i class="bi bi-person-circle"></i> {{ user.username }} ({{ user.get_role_display }})
                             </a>
                             <ul class="dropdown-menu">
                                 <li><a class="dropdown-item" href="#"><i class="bi bi-person"></i> Profile</a></li>
@@ -46,9 +90,6 @@
                     {% else %}
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'accounts:login' %}"><i class="bi bi-box-arrow-in-right"></i> Login</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'accounts:signup' %}"><i class="bi bi-person-plus"></i> Sign Up</a>
                         </li>
                     {% endif %}
                 </ul>

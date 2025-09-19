@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+
+{% block title %}Eliminar Usuario - Admin{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="mb-0">
+                        <i class="bi bi-exclamation-triangle"></i> Confirmar Eliminación
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning">
+                        <i class="bi bi-warning"></i>
+                        <strong>¡Atención!</strong> Esta acción no se puede deshacer.
+                    </div>
+
+                    <p>¿Estás seguro de que deseas eliminar el siguiente usuario?</p>
+
+                    <div class="card bg-light">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-sm-4"><strong>Usuario:</strong></div>
+                                <div class="col-sm-8">{{ user_obj.username }}</div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4"><strong>Nombre:</strong></div>
+                                <div class="col-sm-8">{{ user_obj.get_full_name|default:"Sin especificar" }}</div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4"><strong>Email:</strong></div>
+                                <div class="col-sm-8">{{ user_obj.email|default:"Sin especificar" }}</div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4"><strong>Rol:</strong></div>
+                                <div class="col-sm-8">
+                                    {% if user_obj.role == 'admin' %}
+                                        <span class="badge bg-danger">
+                                            <i class="bi bi-shield-check"></i> {{ user_obj.get_role_display }}
+                                        </span>
+                                    {% else %}
+                                        <span class="badge bg-primary">
+                                            <i class="bi bi-person"></i> {{ user_obj.get_role_display }}
+                                        </span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4"><strong>Fecha de Creación:</strong></div>
+                                <div class="col-sm-8">{{ user_obj.created_at|date:"d/m/Y H:i" }}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4">
+                        <h6><i class="bi bi-info-circle"></i> Consecuencias de la eliminación:</h6>
+                        <ul class="small text-muted">
+                            <li>Se eliminará permanentemente la cuenta del usuario</li>
+                            <li>Se perderán todos los datos asociados al usuario</li>
+                            <li>El usuario no podrá acceder al sistema</li>
+                            <li>Esta acción no se puede revertir</li>
+                        </ul>
+                    </div>
+
+                    <form method="post" class="mt-4">
+                        {% csrf_token %}
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{% url 'accounts:admin_user_list' %}" class="btn btn-secondary me-md-2">
+                                <i class="bi bi-x-circle"></i> Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="bi bi-trash"></i> Sí, Eliminar Usuario
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,228 @@
+{% extends 'base.html' %}
+
+{% block title %}Caja - Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1><i class="bi bi-cash-stack"></i> Panel de Caja</h1>
+                <div class="btn-group" role="group">
+                    {% if not current_register %}
+                        <a href="{% url 'caja:open_register' %}" class="btn btn-success">
+                            <i class="bi bi-unlock"></i> Abrir Caja
+                        </a>
+                    {% else %}
+                        <a href="{% url 'caja:close_register' current_register.id %}" class="btn btn-danger">
+                            <i class="bi bi-lock"></i> Cerrar Caja
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Current Cash Register Status -->
+    {% if current_register %}
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="alert alert-success">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5><i class="bi bi-check-circle"></i> Caja Activa: {{ current_register.name }}</h5>
+                            <p class="mb-0">
+                                Abierta: {{ current_register.opened_at|date:"d/m/Y H:i" }} |
+                                Saldo Inicial: ${{ current_register.opening_balance|floatformat:2 }}
+                            </p>
+                        </div>
+                        <div class="text-end">
+                            <h4 class="mb-0">Balance: ${{ current_register.current_balance|floatformat:2 }}</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="alert alert-warning">
+                    <i class="bi bi-exclamation-triangle"></i>
+                    No tienes una caja abierta. <a href="{% url 'caja:open_register' %}" class="alert-link">Abre una caja</a> para comenzar a registrar transacciones.
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- Daily Summary Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h5 class="card-title">Ingresos Hoy</h5>
+                            <h3>${{ daily_income|floatformat:2 }}</h3>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="bi bi-arrow-up-circle" style="font-size: 2rem;"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card bg-danger text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h5 class="card-title">Egresos Hoy</h5>
+                            <h3>${{ daily_outcome|floatformat:2 }}</h3>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="bi bi-arrow-down-circle" style="font-size: 2rem;"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h5 class="card-title">Balance Diario</h5>
+                            <h3>${{ daily_balance|floatformat:2 }}</h3>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="bi bi-calculator" style="font-size: 2rem;"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h5 class="card-title">Transacciones</h5>
+                            <h3>{{ recent_transactions|length }}</h3>
+                            <small>Últimas 10</small>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="bi bi-list-ul" style="font-size: 2rem;"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="bi bi-lightning"></i> Acciones Rápidas</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="d-grid gap-2">
+                                <a href="{% url 'caja:transaction_create_type' 'income' %}" class="btn btn-success">
+                                    <i class="bi bi-plus-circle"></i> Registrar Ingreso
+                                </a>
+                                <a href="{% url 'caja:transaction_create_type' 'outcome' %}" class="btn btn-danger">
+                                    <i class="bi bi-dash-circle"></i> Registrar Egreso
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-grid gap-2">
+                                <a href="{% url 'caja:transaction_list' %}" class="btn btn-outline-primary">
+                                    <i class="bi bi-list"></i> Ver Todas las Transacciones
+                                </a>
+                                <a href="{% url 'caja:transaction_list' %}?type=income" class="btn btn-outline-success">
+                                    <i class="bi bi-arrow-up"></i> Solo Ingresos
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Transactions -->
+    {% if recent_transactions %}
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5><i class="bi bi-clock-history"></i> Transacciones Recientes</h5>
+                            <a href="{% url 'caja:transaction_list' %}" class="btn btn-outline-primary btn-sm">
+                                Ver todas
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Fecha</th>
+                                        <th>Tipo</th>
+                                        <th>Descripción</th>
+                                        <th>Método</th>
+                                        <th>Monto</th>
+                                        <th>Comisión</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for transaction in recent_transactions %}
+                                        <tr>
+                                            <td>{{ transaction.transaction_date|date:"d/m H:i" }}</td>
+                                            <td>
+                                                {% if transaction.transaction_type == 'income' %}
+                                                    <span class="badge bg-success">
+                                                        <i class="bi bi-arrow-up"></i> Ingreso
+                                                    </span>
+                                                {% else %}
+                                                    <span class="badge bg-danger">
+                                                        <i class="bi bi-arrow-down"></i> Egreso
+                                                    </span>
+                                                {% endif %}
+                                            </td>
+                                            <td>{{ transaction.description }}</td>
+                                            <td>{{ transaction.get_payment_method_display }}</td>
+                                            <td class="text-end">
+                                                {% if transaction.transaction_type == 'income' %}
+                                                    <span class="text-success">+${{ transaction.amount|floatformat:2 }}</span>
+                                                {% else %}
+                                                    <span class="text-danger">-${{ transaction.amount|floatformat:2 }}</span>
+                                                {% endif %}
+                                            </td>
+                                            <td class="text-end">
+                                                {% if transaction.commission > 0 %}
+                                                    ${{ transaction.commission|floatformat:2 }}
+                                                {% else %}
+                                                    -
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
