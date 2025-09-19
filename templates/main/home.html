@@ -4,8 +4,8 @@
 {% block title %}{{ title }} - Software Tienda{% endblock %}
 
 {% block content %}
-<!-- Hero Section -->
-<div class="bg-primary text-white py-5">
+<!-- Sección Principal -->
+<div class="text-white py-5" style="background: linear-gradient(135deg, var(--pastel-primary), var(--pastel-secondary)); box-shadow: 0 4px 20px rgba(0,0,0,0.1);">
     <div class="container">
         <div class="row align-items-center">
             <div class="col-lg-6">
@@ -13,64 +13,64 @@
                 <p class="lead">{{ description }}</p>
                 <div class="mt-4">
                     {% if not user.is_authenticated %}
-                        <a href="{% url 'accounts:signup' %}" class="btn btn-light btn-lg me-3">
-                            <i class="bi bi-person-plus"></i> Get Started
-                        </a>
+                        <!-- <a href="{% url 'accounts:signup' %}" class="btn btn-light btn-lg me-3">
+                            <i class="bi bi-person-plus"></i> Comenzar
+                        </a> -->
                         <a href="{% url 'accounts:login' %}" class="btn btn-outline-light btn-lg">
-                            <i class="bi bi-box-arrow-in-right"></i> Login
+                            <i class="bi bi-box-arrow-in-right"></i> Iniciar Sesión
                         </a>
                     {% else %}
                         <div class="alert alert-light" role="alert">
                             <i class="bi bi-check-circle text-success"></i>
-                            Welcome back, <strong>{{ user.username }}</strong>!
+                            ¡Bienvenido de vuelta, <strong>{{ user.username }}</strong>!
                         </div>
                     {% endif %}
                 </div>
             </div>
             <div class="col-lg-6 text-center">
-                <i class="bi bi-laptop display-1"></i>
+                <i class="bi bi-shop display-1" style="color: rgba(255,255,255,0.8);"></i>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Features Section -->
+<!-- Sección de Características -->
 <div class="py-5">
     <div class="container">
         <div class="row text-center mb-5">
             <div class="col-12">
-                <h2 class="display-5 fw-bold">Why Choose Us?</h2>
-                <p class="lead text-muted">Discover the benefits of our software solutions</p>
+                <h2 class="display-5 fw-bold" style="color: var(--pastel-primary);">¿Por Qué Elegirnos?</h2>
+                <p class="lead text-muted">Descubre los beneficios de nuestras soluciones de software</p>
             </div>
         </div>
-        
+
         <div class="row g-4">
             <div class="col-md-4">
-                <div class="card h-100 shadow-sm border-0">
+                <div class="card h-100 shadow-sm border-0" style="background: linear-gradient(135deg, #ffffff, #f8f9fa);">
                     <div class="card-body text-center">
-                        <i class="bi bi-shield-check text-primary display-4 mb-3"></i>
-                        <h5 class="card-title">Secure & Reliable</h5>
-                        <p class="card-text">Enterprise-grade security with 99.9% uptime guarantee for all our software solutions.</p>
+                        <i class="bi bi-shield-check display-4 mb-3" style="color: var(--pastel-primary);"></i>
+                        <h5 class="card-title" style="color: var(--pastel-dark);">Seguro y Confiable</h5>
+                        <p class="card-text">Seguridad de nivel empresarial con garantía de 99.9% de tiempo activo para todas nuestras soluciones.</p>
                     </div>
                 </div>
             </div>
-            
+
             <div class="col-md-4">
-                <div class="card h-100 shadow-sm border-0">
+                <div class="card h-100 shadow-sm border-0" style="background: linear-gradient(135deg, #ffffff, #f8f9fa);">
                     <div class="card-body text-center">
-                        <i class="bi bi-lightning text-primary display-4 mb-3"></i>
-                        <h5 class="card-title">Fast Performance</h5>
-                        <p class="card-text">Optimized code and modern infrastructure ensure lightning-fast performance.</p>
+                        <i class="bi bi-lightning display-4 mb-3" style="color: var(--pastel-primary);"></i>
+                        <h5 class="card-title" style="color: var(--pastel-dark);">Rendimiento Rápido</h5>
+                        <p class="card-text">Código optimizado e infraestructura moderna garantizan un rendimiento ultra rápido.</p>
                     </div>
                 </div>
             </div>
-            
+
             <div class="col-md-4">
-                <div class="card h-100 shadow-sm border-0">
+                <div class="card h-100 shadow-sm border-0" style="background: linear-gradient(135deg, #ffffff, #f8f9fa);">
                     <div class="card-body text-center">
-                        <i class="bi bi-headset text-primary display-4 mb-3"></i>
-                        <h5 class="card-title">24/7 Support</h5>
-                        <p class="card-text">Round-the-clock customer support to help you whenever you need assistance.</p>
+                        <i class="bi bi-headset display-4 mb-3" style="color: var(--pastel-primary);"></i>
+                        <h5 class="card-title" style="color: var(--pastel-dark);">Soporte 24/7</h5>
+                        <p class="card-text">Atención al cliente las 24 horas para ayudarte cuando necesites asistencia.</p>
                     </div>
                 </div>
             </div>
@@ -78,17 +78,24 @@
     </div>
 </div>
 
-<!-- CTA Section -->
-<div class="bg-light py-5">
+<!-- Sección de Llamada a la Acción -->
+<div class="py-5" style="background: linear-gradient(135deg, #e9ecef, #dee2e6);">
     <div class="container text-center">
         <div class="row">
             <div class="col-lg-8 mx-auto">
-                <h3 class="fw-bold">Ready to Get Started?</h3>
-                <p class="lead text-muted">Join thousands of satisfied customers who trust our software solutions.</p>
+                <h3 class="fw-bold" style="color: var(--pastel-dark);">¿Listo para Comenzar?</h3>
+                <p class="lead text-muted">Únete a miles de clientes satisfechos que confían en nuestras soluciones de software.</p>
                 {% if not user.is_authenticated %}
-                    <a href="{% url 'accounts:signup' %}" class="btn btn-primary btn-lg">
-                        <i class="bi bi-rocket"></i> Start Your Journey
+                    <a href="{% url 'accounts:signup' %}" class="btn btn-primary btn-lg" style="background: linear-gradient(135deg, var(--pastel-primary), var(--pastel-secondary)); border: none; border-radius: 25px; padding: 12px 30px; transition: all 0.3s ease;">
+                        <i class="bi bi-rocket"></i> Comienza tu Viaje
                     </a>
+                {% else %}
+                    <div class="card" style="background: linear-gradient(135deg, #ffffff, #f8f9fa); border: none; border-radius: 15px; max-width: 500px; margin: 0 auto;">
+                        <div class="card-body">
+                            <h5 style="color: var(--pastel-dark);"><i class="bi bi-person-check"></i> ¡Ya estás conectado!</h5>
+                            <p class="text-muted mb-0">Explora nuestras herramientas desde el menú superior.</p>
+                        </div>
+                    </div>
                 {% endif %}
             </div>
         </div>

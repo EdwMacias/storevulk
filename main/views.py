@@ -7,8 +7,8 @@ def home_view(request):
         return redirect('main:dashboard')
     
     context = {
-        'title': 'Bienvenido a Vulkano Contabilidad',
-        'description': 'Sistema de gestión',
+        'title': 'Bienvenido a Vulkano',
+        'description': 'Punto de servicio',
     }
     return render(request, 'main/home.html', context)
 
