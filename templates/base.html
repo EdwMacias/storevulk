@@ -140,20 +140,20 @@
             
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
+                    <!-- <li class="nav-item">
                         <a class="nav-link" href="{% url 'main:home' %}">Home</a>
-                    </li>
+                    </li> -->
                     {% if user.is_authenticated %}
                         <!-- Módulos POS -->
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                                <i class="bi bi-shop"></i> Punto de Venta
+                            <a class="nav-link" href="{% url 'caja:dashboard' %}" role="button" data-bs-toggle="dropdown">
+                                <i class="bi bi-shop"></i> Caja
                             </a>
-                            <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="{% url 'caja:dashboard' %}">
+                            <!-- <ul class="dropdown-menu"> -->
+                                <!-- <li><a class="dropdown-item" href="{% url 'caja:dashboard' %}">
                                     <i class="bi bi-cash-stack"></i> Caja
-                                </a></li>
-                                <li><a class="dropdown-item" href="{% url 'caja:transaction_list' %}">
+                                </a></li> -->
+                                <!-- <li><a class="dropdown-item" href="{% url 'caja:transaction_list' %}">
                                     <i class="bi bi-list-ul"></i> Transacciones
                                 </a></li>
                                 <li><hr class="dropdown-divider"></li>
@@ -162,8 +162,8 @@
                                 </a></li>
                                 <li><a class="dropdown-item" href="#" onclick="alert('Próximamente: Banco')">
                                     <i class="bi bi-bank"></i> Banco
-                                </a></li>
-                            </ul>
+                                </a></li> -->
+                            <!-- </ul> -->
                         </li>
 
                         {% if user.is_admin %}

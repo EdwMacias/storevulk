@@ -17,11 +17,9 @@
             </div>
 
             <!-- Welcome message -->
-            <div class="alert alert-success" role="alert">
-                <h4 class="alert-heading">¡Bienvenido, {{ user.username }}!</h4>
-                <p>Has iniciado sesión correctamente en el sistema de gestión de tienda.</p>
-                <hr>
+            <div class="alert alert-success alert-dismissible fade show" role="alert" id="roleAlert">
                 <p class="mb-0">Tu rol actual es: <strong>{{ user_role }}</strong></p>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
 
             <!-- Role-based content -->
@@ -142,4 +140,17 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Auto-dismiss the role alert after 10 seconds
+    setTimeout(function() {
+        const roleAlert = document.getElementById('roleAlert');
+        if (roleAlert) {
+            const alert = new bootstrap.Alert(roleAlert);
+            alert.close();
+        }
+    }, 10000); // 10 seconds
+</script>
 {% endblock %}
