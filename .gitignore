@@ -120,5 +120,7 @@ logs_pics/
 staticfiles/
 
 #docker builds
-docker.compose.yml
+docker-compose.yml
 CLAUDE.md
+DEPLOYMENT.md
+PROJECT_MEMORY.md

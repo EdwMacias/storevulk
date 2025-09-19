@@ -1,24 +1,57 @@
 version: '3.8'
 
 services:
-  postgres:
-    image: postgres:15
-    container_name: store_postgres_dev
-    environment:
-      POSTGRES_DB: test
-      POSTGRES_USER: test
-      POSTGRES_PASSWORD: test
+  web:
+    build: .
     ports:
-      - "5433:5432"
+      - "8000:8000"
+    volumes:
+      # Mount SQLite database for persistence and access
+      - ./db.sqlite3:/app/db.sqlite3
+      # Mount media files for persistence
+      - ./media:/app/media
+      # Mount static files (optional for development)
+      - ./staticfiles:/app/staticfiles
+    environment:
+      - DEBUG=False
+      - SECRET_KEY=xxxxx
+      - ALLOWED_HOSTS=localhost,127.0.0.1,0.0.0.0
+      - DATABASE_ENGINE=sqlite3
+      - SECURE_SSL_REDIRECT=True
+      - SECURE_PROXY_SSL_HEADER=HTTP_X_FORWARDED_PROTO,https
+      - DJANGO_LOG_LEVEL=INFO
+      - SUPERUSER=admin
+      - SUPERUSER_PASSWORD=admin
+    # depends_on:
+      # - db  # Not needed for SQLite
+    restart: unless-stopped
+
+  # Optional PostgreSQL service (comment out if using SQLite)
+  db:
+    image: postgres:15-alpine
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    environment:
+      - POSTGRES_DB=software
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+    ports:
+      - "5432:5432"
     restart: unless-stopped
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d store_dev"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+
+  # Optional: pgAdmin for database management
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=no@mail.com
+      - PGADMIN_DEFAULT_PASSWORD=password
+    ports:
+      - "5050:80"
+    depends_on:
+      - db
+    restart: unless-stopped
+    profiles:
+      - tools
 
 volumes:
   postgres_data:
